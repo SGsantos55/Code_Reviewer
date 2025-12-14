@@ -12,9 +12,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
-
-load_dotenv()  # loads variables from .env file
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

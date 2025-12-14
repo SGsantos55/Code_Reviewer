@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}AI Code Reviewer{% endblock title %}
+{% block load_css %}
+
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock load_css %}
+
+{% block content %}
+<body>
+<h1 class="page-title">AI code Reviewer</h1>
+
+
+    
+    <form method="POST">
+        {% csrf_token %}
+        <textarea name="code" placeholder="Write or paste your code here...">{{ user_code|default:"" }}</textarea>
+        <br>
+        <button type="submit">Review Code</button>
+    </form>
+
+    {% if error %}
+    <div class="error-box">
+        <h3>Error:</h3>
+        <p>{{ error }}</p>
+        {% if debug %}
+        <details>
+            <summary>Debug Details</summary>
+            <pre>{{ debug }}</pre>
+        </details>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if ai_result %}
+    <div class="review-result">
+        <h3>📝 AI Code Review Result</h3>
+        
+        {% if ai_result.error %}
+        <div class="section">
+            <h4 class="section-title">⚠️ Parsing Error</h4>
+            <p>{{ ai_result.error }}</p>
+            <h4>Raw AI Response:</h4>
+            <pre>{{ ai_result.raw }}</pre>
+        </div>
+        {% else %}
+            {% if ai_result.syntax_errors %}
+            <div class="section">
+                <h4 class="section-title">
+                    ⚠️ Syntax Errors
+                    <span class="badge">{{ ai_result.syntax_errors|length }}</span>
+                </h4>
+                {% if ai_result.syntax_errors|length == 0 %}
+                <p>No syntax errors found ✓</p>
+                {% else %}
+                <ul>
+                    {% for error in ai_result.syntax_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if ai_result.logical_errors %}
+            <div class="section">
+                <h4 class="section-title">
+                    🧠 Logical Errors
+                    <span class="badge">{{ ai_result.logical_errors|length }}</span>
+                </h4>
+                {% if ai_result.logical_errors|length == 0 %}
+                <p>No logical errors found ✓</p>
+                {% else %}
+                <ul>
+                    {% for error in ai_result.logical_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if ai_result.key_improvements %}
+            <div class="section">
+                <h4 class="section-title">
+                    💡 Key Improvements
+                    <span class="badge">{{ ai_result.key_improvements|length }}</span>
+                </h4>
+                <ul>
+                    {% for improvement in ai_result.key_improvements %}
+                    <li>{{ improvement }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if ai_result.fixed_code %}
+            <div class="section">
+                <h4 class="section-title">✅ Fixed Code</h4>
+                <pre class="fixed-code">{{ ai_result.fixed_code }}</pre>
+            </div>
+            {% endif %}
+
+            {% if ai_result.explanation %}
+            <div class="section">
+                <h4 class="section-title">📖 Explanation</h4>
+                <pre>{{ ai_result.explanation }}</pre>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+{% endblock content %}

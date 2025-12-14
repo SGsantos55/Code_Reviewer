@@ -1,0 +1,1 @@
+web: gunicorn code_review_ai.wsgi:application --log-file -
